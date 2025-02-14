@@ -261,7 +261,7 @@ pub fn main() -> Result<(), winit::error::EventLoopError> {
                                 device,
                                 queue,
                                 &mut encoder,
-                                Some(iced_core::Color { r: 1.0, g: 1.0, b: 1.0, a: 1.0 }), // Force black background for debugging
+                                Some(iced_core::Color { r: 0.2, g: 0.2, b: 0.2, a: 1.0 }), // Force black background for debugging
                                 frame.texture.format(),
                                 &view,
                                 viewport,

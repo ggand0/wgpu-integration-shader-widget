@@ -27,6 +27,9 @@ impl shader::Primitive for Primitive {
         let window_size = viewport.physical_size();
         let window_size_tuple = (window_size.width, window_size.height);
 
+        // debug: fixed viewport
+        //let window_size_tuple = (200, 300);
+
         if !storage.has::<Pipeline>() {
             storage.store(Pipeline::new(device, format, window_size_tuple));
         }
