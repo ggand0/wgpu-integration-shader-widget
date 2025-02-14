@@ -12,10 +12,11 @@ pub struct Pipeline {
 impl Pipeline {
     pub fn new(device: &wgpu::Device, format: wgpu::TextureFormat, _window_size: (u32, u32)) -> Self {
         let vertices: [f32; 6] = [
-            -0.5, -0.5, // Bottom left
-             0.5, -0.5, // Bottom right
-             0.0,  0.5, // Top center
+            -0.5, -0.5, // Bottom left (was -0.5, now smaller)
+            0.5, -0.5, // Bottom right
+            0.0,  0.5, // Top center
         ];
+
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Triangle Vertex Buffer"),
@@ -87,7 +88,7 @@ impl Pipeline {
         &self,
         target: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
-        clip_bounds: &Rectangle<u32>,
+        clip_bounds: &Rectangle<u32>, // This defines where to render
     ) {
         let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
@@ -95,7 +96,13 @@ impl Pipeline {
                 view: target,
                 resolve_target: None,
                 ops: wgpu::Operations {
-                    load: wgpu::LoadOp::Clear(wgpu::Color::BLACK),
+                    /*load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: 0.5,
+                        g: 0.5,
+                        b: 0.5,
+                        a: 0.0,
+                    }),*/
+                    load: wgpu::LoadOp::Load,
                     store: wgpu::StoreOp::Store,
                 },
             })],
@@ -103,10 +110,20 @@ impl Pipeline {
             occlusion_query_set: None,
             timestamp_writes: None,
         });
+    
+        // Apply clipping based on the shader widget's bounds
+        pass.set_scissor_rect(
+            clip_bounds.x,
+            clip_bounds.y,
+            clip_bounds.width,
+            clip_bounds.height,
+        );
 
         pass.set_pipeline(&self.pipeline);
         pass.set_vertex_buffer(0, self.vertices.slice(..));
         pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
         pass.draw_indexed(0..self.num_indices, 0, 0..1);
+
     }
+    
 }
